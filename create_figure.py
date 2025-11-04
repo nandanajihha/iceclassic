@@ -158,21 +158,24 @@ def plot_location_map(plot_size: tuple = (10, 8)) -> plt.Figure:
     nenana_lat = 64.5633
     nenana_lon = -149.0933
     
+    # Alaska map boundaries (latitude and longitude ranges)
+    ALASKA_LAT_MIN, ALASKA_LAT_MAX = 51, 72
+    ALASKA_LON_MIN, ALASKA_LON_MAX = -170, -130
+    
+    # Highlight circle radius (in degrees)
+    HIGHLIGHT_RADIUS = 2.0
+    
     fig, ax = plt.subplots(figsize=plot_size)
     
-    # Simple representation of Alaska and surrounding area
-    # Draw a simplified outline (rectangle representing the region)
-    alaska_lat_min, alaska_lat_max = 51, 72
-    alaska_lon_min, alaska_lon_max = -170, -130
-    
-    ax.set_xlim(alaska_lon_min, alaska_lon_max)
-    ax.set_ylim(alaska_lat_min, alaska_lat_max)
+    # Set map boundaries
+    ax.set_xlim(ALASKA_LON_MIN, ALASKA_LON_MAX)
+    ax.set_ylim(ALASKA_LAT_MIN, ALASKA_LAT_MAX)
     
     # Plot Nenana location
     ax.plot(nenana_lon, nenana_lat, 'ro', markersize=15, label='Nenana', zorder=5)
     
     # Add a circle around Nenana to highlight it
-    circle = mpatches.Circle((nenana_lon, nenana_lat), 2.0, 
+    circle = mpatches.Circle((nenana_lon, nenana_lat), HIGHLIGHT_RADIUS, 
                              fill=False, edgecolor='red', linewidth=2, linestyle='--')
     ax.add_patch(circle)
     
