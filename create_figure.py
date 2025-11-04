@@ -2,10 +2,10 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import matplotlib.dates as mdates
 import datetime as dt
 from scipy.stats import norm,gaussian_kde
-import matplotlib.patches as mpatches
 
 def get_path(filename, subdir=None):
     if subdir==None:
@@ -154,9 +154,8 @@ def plot_location_map(plot_size: tuple = (10, 8)) -> plt.Figure:
     plt.Figure
         Figure object containing the location map.
     """
-    # Nenana, Alaska coordinates
-    nenana_lat = 64.5633
-    nenana_lon = -149.0933
+    # Load location data from CSV
+    locations = pd.read_csv(get_path('location.csv', subdir='data'))
     
     # Alaska map boundaries (latitude and longitude ranges)
     ALASKA_LAT_MIN, ALASKA_LAT_MAX = 51, 72
@@ -170,6 +169,10 @@ def plot_location_map(plot_size: tuple = (10, 8)) -> plt.Figure:
     # Set map boundaries
     ax.set_xlim(ALASKA_LON_MIN, ALASKA_LON_MAX)
     ax.set_ylim(ALASKA_LAT_MIN, ALASKA_LAT_MAX)
+    
+    # Get Nenana coordinates
+    nenana = locations[locations['Location'] == 'Nenana'].iloc[0]
+    nenana_lat, nenana_lon = nenana['Latitude'], nenana['Longitude']
     
     # Plot Nenana location
     ax.plot(nenana_lon, nenana_lat, 'ro', markersize=15, label='Nenana', zorder=5)
@@ -189,12 +192,14 @@ def plot_location_map(plot_size: tuple = (10, 8)) -> plt.Figure:
     
     # Add reference cities for context
     # Anchorage
-    anchorage_lat, anchorage_lon = 61.2181, -149.9003
+    anchorage = locations[locations['Location'] == 'Anchorage'].iloc[0]
+    anchorage_lat, anchorage_lon = anchorage['Latitude'], anchorage['Longitude']
     ax.plot(anchorage_lon, anchorage_lat, 'b^', markersize=10, label='Anchorage')
     ax.text(anchorage_lon - 1, anchorage_lat - 2, 'Anchorage', fontsize=9)
     
     # Fairbanks
-    fairbanks_lat, fairbanks_lon = 64.8378, -147.7164
+    fairbanks = locations[locations['Location'] == 'Fairbanks'].iloc[0]
+    fairbanks_lat, fairbanks_lon = fairbanks['Latitude'], fairbanks['Longitude']
     ax.plot(fairbanks_lon, fairbanks_lat, 'bs', markersize=10, label='Fairbanks')
     ax.text(fairbanks_lon + 1, fairbanks_lat, 'Fairbanks', fontsize=9)
     
