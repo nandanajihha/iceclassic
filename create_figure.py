@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime as dt
 from scipy.stats import norm,gaussian_kde
+import matplotlib.patches as mpatches
 
 def get_path(filename, subdir=None):
     if subdir==None:
@@ -139,6 +140,77 @@ def plot_date_time_distribution(df_1: pd.DataFrame,
     return fig
 
 
+def plot_location_map(plot_size: tuple = (10, 8)) -> plt.Figure:
+    """
+    Create a simple map showing the location of Nenana, Alaska.
+    
+    Parameters
+    ----------
+    plot_size : tuple, optional
+        Size of the plot. The default is (10, 8).
+    
+    Returns
+    -------
+    plt.Figure
+        Figure object containing the location map.
+    """
+    # Nenana, Alaska coordinates
+    nenana_lat = 64.5633
+    nenana_lon = -149.0933
+    
+    fig, ax = plt.subplots(figsize=plot_size)
+    
+    # Simple representation of Alaska and surrounding area
+    # Draw a simplified outline (rectangle representing the region)
+    alaska_lat_min, alaska_lat_max = 51, 72
+    alaska_lon_min, alaska_lon_max = -170, -130
+    
+    ax.set_xlim(alaska_lon_min, alaska_lon_max)
+    ax.set_ylim(alaska_lat_min, alaska_lat_max)
+    
+    # Plot Nenana location
+    ax.plot(nenana_lon, nenana_lat, 'ro', markersize=15, label='Nenana', zorder=5)
+    
+    # Add a circle around Nenana to highlight it
+    circle = mpatches.Circle((nenana_lon, nenana_lat), 2.0, 
+                             fill=False, edgecolor='red', linewidth=2, linestyle='--')
+    ax.add_patch(circle)
+    
+    # Add text annotation
+    ax.annotate('Nenana, Alaska\nIce Classic Location', 
+                xy=(nenana_lon, nenana_lat), 
+                xytext=(nenana_lon + 5, nenana_lat + 3),
+                fontsize=12, fontweight='bold',
+                bbox=dict(boxstyle='round,pad=0.5', facecolor='yellow', alpha=0.7),
+                arrowprops=dict(arrowstyle='->', lw=2, color='red'))
+    
+    # Add reference cities for context
+    # Anchorage
+    anchorage_lat, anchorage_lon = 61.2181, -149.9003
+    ax.plot(anchorage_lon, anchorage_lat, 'b^', markersize=10, label='Anchorage')
+    ax.text(anchorage_lon - 1, anchorage_lat - 2, 'Anchorage', fontsize=9)
+    
+    # Fairbanks
+    fairbanks_lat, fairbanks_lon = 64.8378, -147.7164
+    ax.plot(fairbanks_lon, fairbanks_lat, 'bs', markersize=10, label='Fairbanks')
+    ax.text(fairbanks_lon + 1, fairbanks_lat, 'Fairbanks', fontsize=9)
+    
+    ax.set_xlabel('Longitude', fontsize=12)
+    ax.set_ylabel('Latitude', fontsize=12)
+    ax.set_title('Nenana Ice Classic - Event Location', fontsize=14, fontweight='bold')
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc='upper right')
+    
+    # Add coordinate information
+    coord_text = f'Coordinates: {nenana_lat}°N, {abs(nenana_lon)}°W'
+    ax.text(0.02, 0.02, coord_text, transform=ax.transAxes,
+            fontsize=10, verticalalignment='bottom',
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+    
+    plt.tight_layout()
+    return fig
+
+
 past_break_up_dates = pd.read_csv(get_path('breakup_dates.csv', subdir='data'))
 past_break_up_dates['Break up dates'] = pd.to_datetime(past_break_up_dates['Break up dates'], errors='coerce')
 past_break_up_dates['decimal time'] =past_break_up_dates['Break up dates'].dt.hour +past_break_up_dates['Break up dates'].dt.minute / 60
@@ -160,3 +232,7 @@ fig = plot_date_time_distribution(predictions, 'Prediction', 'decimal time',
                             title='Historic Breakup (with density estimates) and 2025 Predictions',
                             plot_limits=(60, 155));
 fig.savefig(get_path('predictions.svg'))
+
+# Generate location map
+fig_map = plot_location_map()
+fig_map.savefig(get_path('location_map.svg'))

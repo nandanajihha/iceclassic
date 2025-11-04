@@ -97,13 +97,13 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add predictions.svg predictions_all.svg README.md
-        git diff --staged --quiet || (git commit -m 'Update predictions*.svg' && git push)
+        git add predictions.svg predictions_all.svg location_map.svg README.md
+        git diff --staged --quiet || (git commit -m 'Update predictions*.svg and location_map.svg' && git push)
 
     - name: Check for changes (PR validation only)
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        git add predictions.svg predictions_all.svg README.md
+        git add predictions.svg predictions_all.svg location_map.svg README.md
         if ! git diff --staged --quiet; then
           echo "✅ The Python script successfully generated changes to the SVG files."
           echo "This PR will update the plot files when merged."
